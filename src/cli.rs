@@ -33,6 +33,8 @@ pub enum Commands {
         #[arg(short = 's', long = "server", help = "Server URL")]
         server: String,
     },
+    /// Get astrbot stat
+    Stat,
 }
 
 #[derive(Subcommand, AsRefStr)]

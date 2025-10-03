@@ -1,12 +1,14 @@
 use clap::Parser;
 use cli::{handle_plugin_command, Cli, Commands};
 use login::handle_login;
+use stat::handle_stat;
 
 mod api;
 mod cli;
 mod config;
 mod login;
 mod plugin;
+mod stat;
 mod utils;
 mod verbose;
 
@@ -26,5 +28,12 @@ async fn main() {
             password,
             server,
         } => handle_login(username, password, server).await,
+        Commands::Stat => {
+            let ret = handle_stat().await;
+            match ret {
+                Ok(ret) => ret.pretty_print(),
+                Err(e) => eprintln!("Error retrieving statistics: {}", e),
+            }
+        }
     }
 }
