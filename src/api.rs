@@ -1,9 +1,21 @@
 use std::collections::HashMap;
 
+use futures::stream::StreamExt;
 use reqwest::{multipart, Method};
+use reqwest_eventsource::{Event, EventSource};
 use serde::{de::DeserializeOwned, Deserialize};
 
-use crate::{plugin::Plugin, stat::Stat, vprintln};
+use crate::{iprintln, plugin::Plugin, stat::Stat, vprintln};
+
+#[derive(Deserialize)]
+#[allow(dead_code)]
+struct LiveLogMessage {
+    #[serde(rename = "type")]
+    typo: String,
+    level: String,
+    time: String,
+    data: String,
+}
 
 #[derive(Deserialize, Debug)]
 pub struct ApiResponse<T> {
@@ -160,5 +172,28 @@ impl ApiClient {
         } else {
             anyhow::bail!("API error: {}", resp.message);
         }
+    }
+
+    pub async fn get_live_log(&self) -> anyhow::Result<()> {
+        let request_builder = self.request(Method::GET, "api/live-log");
+        let mut es = EventSource::new(request_builder)?;
+        while let Some(event) = es.next().await {
+            match event {
+                Ok(ev) => match ev {
+                    Event::Open => {
+                        iprintln!("Start to print live log");
+                    }
+                    Event::Message(message) => {
+                        let message: LiveLogMessage = serde_json::from_str(&message.data)?;
+                        println!("{}", message.data);
+                    }
+                },
+                Err(err) => {
+                    eprintln!("Error: {}", err);
+                    es.close();
+                }
+            }
+        }
+        Ok(())
     }
 }

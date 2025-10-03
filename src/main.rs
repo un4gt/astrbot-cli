@@ -1,11 +1,13 @@
 use clap::Parser;
 use cli::{handle_plugin_command, Cli, Commands};
+use live_log::handle_live_log;
 use login::handle_login;
 use stat::handle_stat;
 
 mod api;
 mod cli;
 mod config;
+mod live_log;
 mod login;
 mod plugin;
 mod stat;
@@ -34,6 +36,9 @@ async fn main() {
                 Ok(ret) => ret.pretty_print(),
                 Err(e) => eprintln!("Error retrieving statistics: {}", e),
             }
+        }
+        Commands::Log => {
+            let _ = handle_live_log().await;
         }
     }
 }

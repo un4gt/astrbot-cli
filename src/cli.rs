@@ -35,6 +35,8 @@ pub enum Commands {
     },
     /// Get astrbot stat
     Stat,
+    /// Get astrbot live log
+    Log,
 }
 
 #[derive(Subcommand, AsRefStr)]
