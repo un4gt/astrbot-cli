@@ -1,386 +1,130 @@
 # AstrBot CLI
 
-A command-line interface for managing AstrBot instances with enhanced authentication debugging and persistent credential storage.
+用于管理 AstrBot 实例的命令行界面，具有增强的身份验证调试和持久凭证存储。
 
-## Features
+## 目录
 
-- 🔐 **Persistent Authentication**: Credentials are saved to a config file and persist across command executions
-- 🔍 **Comprehensive Debugging**: Detailed authentication status and error diagnostics
-- 📢 **Verbose Output Control**: Use `--verbose` flag for detailed logs and comprehensive information
-- 🛡️ **Robust JSON Parsing**: Focuses on core fields (name, version, activated) and gracefully handles unexpected or missing fields
-- 🌐 **Plugin Management**: List, install, enable/disable plugins
-- 📊 **Status Monitoring**: Real-time authentication and connection status
-- 🛠️ **Troubleshooting Tools**: Built-in diagnostics for common authentication issues
+- [介绍](#介绍)
+- [安装](#安装)
+- [使用](#使用)
 
-## Installation
+## 介绍
 
-```bash
-cargo build --release
-```
+AstrBot CLI 是一个强大的命令行工具，专为管理 AstrBot 实例而设计。它提供了插件管理和用户登录功能，支持从本地路径或 Git 仓库安装插件，并具备详细的日志输出选项。该工具基于 Rust 开发，确保高性能和可靠性。
 
-## Quick Start
+### 主要功能
 
-1. **Login to your AstrBot instance:**
+- **插件管理**：获取插件列表、安装、启用/禁用、重新加载和卸载插件。
+- **用户登录**：支持用户名、密码和服务器 URL 的身份验证。
+- **详细日志**：通过 `--verbose` 选项启用详细输出，便于调试。
+- **持久凭证存储**：安全存储登录凭证，避免重复输入。
+
+## 安装
+
+### 前置要求
+
+- [Rust](https://www.rust-lang.org/) (版本 1.70 或更高)
+- Cargo (Rust 的包管理器，随 Rust 一起安装)
+
+### 步骤
+
+1. **克隆仓库**：
    ```bash
-   cargo run -- login -u your_username -p your_password -s http://your-server:port
+   git clone https://github.com/un4gt/astrbot-cli.git
+   cd astrbot-cli
    ```
 
-2. **Check authentication status:**
+2. **构建项目**：
    ```bash
-   cargo run -- status
+   cargo build --release
    ```
 
-3. **List installed plugins:**
+3. **安装到系统**（可选）：
    ```bash
-   # Minimal output (default)
-   cargo run -- plugin get
-   
-   # Verbose output with detailed logs
-   cargo run -- --verbose plugin get
+   cargo install --path .
    ```
 
-## Verbose Output
+安装完成后，您可以使用 `astrbot` 命令开始使用工具。
 
-All commands support the `--verbose` flag for detailed output and comprehensive logging:
+## 使用
 
-### Normal Mode (Default)
-```
-Fetching plugin list...
-✅ Authentication validated
-✅ Found 6 plugin(s):
+AstrBot CLI 提供了两个主要命令：`login` 和 `plugin`。以下是详细的使用示例。
 
-✅ thinking_filter (1.0.0)
-✅ astrbot-reminder (0.0.1)
-✅ session_controller (v1.0.1)
-```
+### 全局选项
 
-### Verbose Mode (`--verbose` flag)
-```
-ℹ️  [INFO] Fetching plugin list...
-✅ [SUCCESS] Authentication validated
-🔍 [VERBOSE] Server: http://your-server.com
-🐛 [DEBUG] Token: eyJhbGci...
-🔍 [VERBOSE] Starting plugin retrieval process
-🔍 [VERBOSE] JSON parsing successful: 6 plugins found
+- `--verbose` 或 `-v`：启用详细输出模式。
 
-Name                      Version      Status
---------------------------------------------------
-thinking_filter           1.0.0        ✅ Active
-astrbot-reminder          0.0.1        ✅ Active
-session_controller        v1.0.1       ✅ Active
-```
+### 登录命令
 
-**Benefits of Verbose Mode:**
-- 📊 Detailed HTTP request/response information
-- 🔍 JSON parsing progress and statistics
-- 🐛 Debug information including tokens (truncated for security)
-- 📈 Step-by-step process tracking
-- 🚨 Enhanced error diagnostics
-
-## Commands
-
-### Authentication Commands
-
-#### `login`
-Authenticate with an AstrBot server and save credentials.
+用于登录到 AstrBot 服务器。
 
 ```bash
-cargo run -- login -u USERNAME -p PASSWORD -s SERVER_URL
+astrbot login --username <用户名> --password <密码> --server <服务器URL>
 ```
 
-**Options:**
-- `-u, --username`: Your AstrBot username
-- `-p, --password`: Your AstrBot password  
-- `-s, --server`: Server URL (e.g., `http://localhost:6185`)
-
-**Example:**
+示例：
 ```bash
-cargo run -- login -u admin -p mypassword -s http://localhost:6185
+astrbot login --username myuser --password mypass --server https://astrbot.example.com
 ```
 
-#### `status`
-Display comprehensive authentication status and debugging information.
+### 插件管理命令
+
+#### 获取插件列表
 
 ```bash
-cargo run -- status
+astrbot plugin get
 ```
 
-This command shows:
-- Environment variable status
-- Config file location and contents
-- Effective credentials being used
-- Troubleshooting recommendations
+#### 安装插件
 
-#### `logout`
-Clear stored credentials from the config file.
+从本地路径安装：
+```bash
+astrbot plugin install --from-local
+```
+
+从 Git 仓库安装：
+```bash
+astrbot plugin install --from-git https://github.com/example/plugin-repo.git
+```
+
+#### 禁用插件
 
 ```bash
-cargo run -- logout
+astrbot plugin off <插件名称>
 ```
 
-### Plugin Management Commands
+示例：
+```bash
+astrbot plugin off my-plugin
+```
 
-#### `plugin get`
-List all installed plugins with their status.
+#### 启用插件
 
 ```bash
-# Minimal output
-cargo run -- plugin get
-
-# Detailed output with verbose information
-cargo run -- --verbose plugin get
+astrbot plugin on <插件名称>
 ```
 
-**Output Modes:**
-- **Normal**: Clean, minimal output showing essential plugin information
-- **Verbose**: Comprehensive table with detailed parsing logs and HTTP request information
-
-#### `plugin install` (Coming Soon)
-Install plugins from local path or git repository.
+#### 重新加载插件
 
 ```bash
-cargo run -- plugin install --from-git https://github.com/user/plugin.git
-cargo run -- plugin install --from-local /path/to/plugin
+astrbot plugin reload <插件名称>
 ```
 
-#### `plugin on/off` (Coming Soon)
-Enable or disable specific plugins.
+#### 卸载插件
 
 ```bash
-cargo run -- plugin on plugin_name
-cargo run -- plugin off plugin_name
+astrbot plugin uninstall <插件名称>
 ```
 
-## Robust JSON Parsing
+### 完整示例
 
-The CLI implements fault-tolerant JSON parsing designed to handle real-world API responses:
-
-### Core Features
-
-- **Focuses on Essential Fields**: Extracts only the three core fields (name, version, activated)
-- **Ignores Extra Fields**: Gracefully handles unexpected fields like `online_version`, `handlers`, etc.
-- **Provides Fallback Values**: Uses sensible defaults for missing fields
-- **Continues on Errors**: Processes remaining plugins even if some fail to parse
-- **Supports Multiple Formats**: Handles various JSON structures automatically
-
-### Supported JSON Formats
-
-```json
-// Direct array
-[{"name": "plugin1", "version": "1.0.0", "activated": true}]
-
-// API wrapper (standard AstrBot response)
-{
-  "status": "ok",
-  "data": [{"name": "plugin1", "version": "1.0.0", "activated": true}]
-}
-
-// Single plugin object
-{"name": "plugin1", "version": "1.0.0", "activated": true, "extra_field": "ignored"}
-
-// Minimal plugin (with automatic defaults)
-{"name": "plugin1"}  // version → "0.0.0", activated → false
-```
-
-### Boolean Field Flexibility
-
-The `activated` field supports multiple representations:
-- **Boolean**: `true`, `false`
-- **String**: `"true"`, `"false"`, `"1"`, `"0"`, `"yes"`, `"no"`, `"on"`, `"off"`, `"enabled"`, `"disabled"`
-- **Number**: `1` (true), `0` (false), any non-zero number (true)
-
-### Error Handling
-
-- **Partial Failures**: If some plugins fail to parse, the CLI continues processing others
-- **Verbose Logging**: Use `--verbose` to see detailed parsing information
-- **Graceful Degradation**: Missing or malformed fields use sensible defaults
-
-## Authentication System
-
-### How It Works
-
-The CLI uses a dual-layer authentication system:
-
-1. **Environment Variables** (temporary, current session only)
-   - `ASTRBOT_TOKEN`: Authentication token
-   - `ASTRBOT_SERVER_URL`: Server URL
-
-2. **Config File** (persistent across sessions)
-   - Location: `~/.astrbot/credentials.json`
-   - Contains: token, server URL, username, creation timestamp
-
-### Priority Order
-
-1. Environment variables (if both token and server URL are set)
-2. Config file (fallback for persistent storage)
-
-### Why Environment Variables Don't Persist
-
-When you run `cargo run login` and then `cargo run plugin get` as separate commands, they execute as separate processes. Environment variables set in the first process don't carry over to the second process. This is why the CLI now uses a persistent config file.
-
-## Troubleshooting
-
-### Common Issues
-
-#### "No authentication token found"
-
-**Symptoms:**
-- Login appears successful but subsequent commands fail
-- Error: "No authentication token found"
-
-**Causes:**
-- Running commands as separate `cargo run` executions
-- Environment variables don't persist between processes
-
-**Solutions:**
-1. **Use the config file system** (recommended):
-   ```bash
-   cargo run -- login -u username -p password -s server_url
-   cargo run -- plugin get  # This will now work
-   ```
-
-2. **Check authentication status:**
-   ```bash
-   cargo run -- status
-   ```
-
-3. **Clear and re-login if needed:**
-   ```bash
-   cargo run -- logout
-   cargo run -- login -u username -p password -s server_url
-   ```
-
-#### "Failed to connect to server"
-
-**Symptoms:**
-- Network errors during API calls
-- Connection timeouts
-
-**Solutions:**
-1. **Verify server URL:**
-   ```bash
-   cargo run -- status  # Check current server URL
-   ```
-
-2. **Test server accessibility:**
-   - Open the server URL in a web browser
-   - Ensure the server is running
-   - Check firewall settings
-
-3. **Re-login with correct URL:**
-   ```bash
-   cargo run -- login -u username -p password -s http://correct-server:port
-   ```
-
-#### "Invalid credentials"
-
-**Symptoms:**
-- Login fails with authentication error
-- API calls return 401/403 errors
-
-**Solutions:**
-1. **Verify credentials:**
-   - Double-check username and password
-   - Ensure account exists and is active
-
-2. **Clear old credentials:**
-   ```bash
-   cargo run -- logout
-   cargo run -- login -u username -p password -s server_url
-   ```
-
-### Debug Information
-
-Use the `status` command to get comprehensive debugging information:
-
+启用详细输出并获取插件列表：
 ```bash
-cargo run -- status
+astrbot --verbose plugin get
 ```
 
-This shows:
-- ✅/❌ Environment variable status
-- 📁 Config file location and contents
-- 🎯 Effective credentials being used
-- 💡 Specific recommendations for your situation
-
-### Advanced Troubleshooting
-
-#### Manual Config File Inspection
-
-Config file location: `~/.astrbot/credentials.json`
-
-```json
-{
-  "token": "your_auth_token_here",
-  "server_url": "http://your-server:port",
-  "username": "your_username",
-  "created_at": "2024-01-01T12:00:00Z"
-}
-```
-
-#### Environment Variable Debugging
-
-Check current environment variables:
+登录并安装插件：
 ```bash
-# Windows
-set | findstr ASTRBOT
-
-# Linux/Mac
-env | grep ASTRBOT
-```
-
-## Development
-
-### Project Structure
-
-```
-src/
-├── main.rs          # Entry point and command routing
-├── cli.rs           # Command-line interface definitions (with --verbose flag)
-├── config.rs        # Persistent credential storage and status
-├── login.rs         # Authentication handling
-├── plugin.rs        # Plugin management commands
-├── api.rs           # HTTP API client with robust JSON parsing
-├── verbose.rs       # Verbose output control system
-└── robust_plugin.rs # Fault-tolerant JSON parsing for plugin data
-```
-
-### Key Components
-
-- **ConfigManager**: Handles persistent credential storage
-- **AuthStatus**: Comprehensive authentication state tracking
-- **Verbose Output System**: Categorized logging with different verbosity levels
-- **RobustPlugin**: Fault-tolerant JSON deserialization focusing on core fields
-- **Enhanced Error Handling**: Detailed diagnostics for common issues
-- **Dual Authentication**: Environment variables + config file
-
-### Building
-
-```bash
-# Development build
-cargo build
-
-# Release build
-cargo build --release
-
-# Run tests (including robust JSON parsing tests)
-cargo test
-
-# Run with logging
-RUST_LOG=debug cargo run -- status
-
-# Test verbose output
-cargo run -- --verbose plugin get
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-[Add your license information here]
+astrbot login --username admin --password secret --server https://api.astrbot.com
+astrbot plugin install --from-git https://github.com/un4gt/astrbot-plugin-example.git
+astrbot plugin on astrbot-plugin-example
