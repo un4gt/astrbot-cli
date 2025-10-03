@@ -26,7 +26,7 @@ AstrBot CLI 是一个强大的命令行工具，专为管理 AstrBot 实例而�
 - [Rust](https://www.rust-lang.org/) (版本 1.70 或更高)
 - Cargo (Rust 的包管理器，随 Rust 一起安装)
 
-### 步骤
+### 源码安装
 
 1. **克隆仓库**：
    ```bash
@@ -43,6 +43,21 @@ AstrBot CLI 是一个强大的命令行工具，专为管理 AstrBot 实例而�
    ```bash
    cargo install --path .
    ```
+
+### 从 [GitHub Releases](https://github.com/un4gt/astrbot-cli/releases) 安装
+
+- Linux
+  ```bash
+  curl --proto '=https' --tlsv1.2 -LsSf https://github.com/un4gt/astrbot-cli/releases/download/v0.1.0/astrbot-cli-installer.sh | sh
+  ```
+- Windows powershell
+  ```powershell
+  powershell -ExecutionPolicy Bypass -c "irm https://github.com/un4gt/astrbot-cli/releases/download/v0.1.0/astrbot-cli-installer.ps1 | iex"
+  ```
+- Macos
+  ```bash
+  brew install astrbot-cli
+  ```
 
 安装完成后，您可以使用 `astrbot` 命令开始使用工具。
 
