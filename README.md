@@ -44,15 +44,15 @@ AstrBot CLI 是一个强大的命令行工具，专为管理 AstrBot 实例而�
    cargo install --path .
    ```
 
-### 从 [GitHub Releases](https://github.com/un4gt/astrbot-cli/releases) 安装
+### [GitHub Releases](https://github.com/un4gt/astrbot-cli/releases) 安装
 
 - Linux
   ```bash
-  curl --proto '=https' --tlsv1.2 -LsSf https://github.com/un4gt/astrbot-cli/releases/download/v0.1.0/astrbot-cli-installer.sh | sh
+  curl --proto '=https' --tlsv1.2 -LsSf https://github.com/un4gt/astrbot-cli/releases/download/v0.1.2/astrbot-cli-installer.sh | sh
   ```
 - Windows powershell
   ```powershell
-  powershell -ExecutionPolicy Bypass -c "irm https://github.com/un4gt/astrbot-cli/releases/download/v0.1.0/astrbot-cli-installer.ps1 | iex"
+  powershell -ExecutionPolicy Bypass -c "irm https://github.com/un4gt/astrbot-cli/releases/download/v0.1.2/astrbot-cli-installer.ps1 | iex"
   ```
 - Macos
   ```bash
@@ -63,7 +63,7 @@ AstrBot CLI 是一个强大的命令行工具，专为管理 AstrBot 实例而�
 
 ## 使用
 
-AstrBot CLI 提供了两个主要命令：`login` 和 `plugin`。以下是详细的使用示例。
+AstrBot CLI 提供了四个主要命令：`login`、`plugin`、`stat` 和 `log`。以下是详细的使用示例。
 
 ### 全局选项
 
@@ -131,6 +131,39 @@ astrbot plugin reload <插件名称>
 astrbot plugin uninstall <插件名称>
 ```
 
+### 统计命令
+
+获取 AstrBot 实例的运行统计信息，包括消息数量、插件数量、运行时间、内存使用和 CPU 负载等。
+
+```bash
+astrbot stat
+```
+
+示例输出：
+```
+开始时间: 2025-09-13 17:59:36
+消息平台:
+  aiocqhttp: 60 (最后更新 2025-10-02 20:14:39)
+消息总数: 1027
+插件数量: 7
+已运行:
+482小时15分3秒
+内存占用:
+  进程: 239
+  系统: 3400
+CPU 负载: 2
+```
+
+### 日志命令
+
+获取 AstrBot 实例的实时日志输出，用于监控和调试。
+
+```bash
+astrbot log
+```
+
+此命令将持续输出 AstrBot 的实时日志，直到手动停止（Ctrl+C）。
+
 ### 完整示例
 
 启用详细输出并获取插件列表：
@@ -143,3 +176,4 @@ astrbot --verbose plugin get
 astrbot login --username admin --password secret --server https://api.astrbot.com
 astrbot plugin install --from-git https://github.com/un4gt/astrbot-plugin-example.git
 astrbot plugin on astrbot-plugin-example
+```
