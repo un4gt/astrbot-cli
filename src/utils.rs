@@ -1,7 +1,8 @@
 use std::env;
 use std::path::PathBuf;
 
-use anyhow::{Context, Ok};
+use anyhow::Context;
+use chrono::{TimeZone, Utc};
 use tokio::process::Command;
 
 use crate::api::ApiClient;
@@ -56,4 +57,9 @@ pub async fn create_git_archive() -> anyhow::Result<String> {
 pub fn build_client() -> anyhow::Result<ApiClient> {
     let credentials = ConfigManager::load_credentials()?;
     Ok(ApiClient::new(credentials.server_url, credentials.token))
+}
+
+pub fn strf_timestamp(secs: i64) -> anyhow::Result<String> {
+    let dt_utc = Utc.timestamp_opt(secs, 0).unwrap();
+    Ok(dt_utc.format("%Y-%m-%d %H:%M:%S").to_string())
 }
