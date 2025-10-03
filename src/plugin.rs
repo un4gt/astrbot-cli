@@ -1,6 +1,5 @@
-use crate::api::ApiClient;
-use crate::config::ConfigManager;
 use crate::iprintln;
+use crate::utils::build_client;
 use crate::utils::create_git_archive;
 use serde::{Deserialize, Serialize};
 
@@ -31,11 +30,6 @@ impl Plugin {
         println!("Activated: {}", self.activated);
         println!()
     }
-}
-
-fn build_client() -> anyhow::Result<ApiClient> {
-    let credentials = ConfigManager::load_credentials()?;
-    Ok(ApiClient::new(credentials.server_url, credentials.token))
 }
 
 pub async fn handle_plugin_get() -> anyhow::Result<Vec<Plugin>> {

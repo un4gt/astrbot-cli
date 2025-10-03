@@ -4,6 +4,8 @@ use std::path::PathBuf;
 use anyhow::{Context, Ok};
 use tokio::process::Command;
 
+use crate::api::ApiClient;
+use crate::config::ConfigManager;
 use crate::vprintln;
 
 pub async fn create_git_archive() -> anyhow::Result<String> {
@@ -49,4 +51,9 @@ pub async fn create_git_archive() -> anyhow::Result<String> {
 
     vprintln!("Archive created: {}", output_file);
     Ok(output_file)
+}
+
+pub fn build_client() -> anyhow::Result<ApiClient> {
+    let credentials = ConfigManager::load_credentials()?;
+    Ok(ApiClient::new(credentials.server_url, credentials.token))
 }
