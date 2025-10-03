@@ -1,16 +1,24 @@
 use std::collections::HashMap;
 
-use anyhow::Ok;
 use reqwest::{multipart, Method};
 use serde::{de::DeserializeOwned, Deserialize};
 
-use crate::{plugin::Plugin, vprintln};
+use crate::{plugin::Plugin, stat::Stat, vprintln};
 
 #[derive(Deserialize, Debug)]
 pub struct ApiResponse<T> {
     pub status: String,
+    #[serde(default, deserialize_with = "null_to_empty_string")]
     pub message: String,
     pub data: Option<T>,
+}
+
+fn null_to_empty_string<'de, D>(deserializer: D) -> Result<String, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let opt = Option::<String>::deserialize(deserializer)?;
+    Ok(opt.unwrap_or_default())
 }
 
 impl<T> ApiResponse<T> {
@@ -134,6 +142,21 @@ impl ApiClient {
 
         if resp.is_ok() {
             Ok(resp.message)
+        } else {
+            anyhow::bail!("API error: {}", resp.message);
+        }
+    }
+
+    pub async fn get_stat(&self) -> anyhow::Result<Stat> {
+        let resp = self
+            .send_and_parse::<Stat>(self.request(Method::GET, "/api/stat/get"))
+            .await?;
+
+        if resp.is_ok() {
+            match resp.data {
+                Some(stat) => Ok(stat),
+                None => anyhow::bail!("No data received"),
+            }
         } else {
             anyhow::bail!("API error: {}", resp.message);
         }
