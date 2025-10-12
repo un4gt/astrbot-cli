@@ -48,11 +48,11 @@ AstrBot CLI 是一个强大的命令行工具，专为管理 AstrBot 实例而�
 
 - Linux
   ```bash
-  curl --proto '=https' --tlsv1.2 -LsSf https://github.com/un4gt/astrbot-cli/releases/download/v0.1.2/astrbot-cli-installer.sh | sh
+  curl --proto '=https' --tlsv1.2 -LsSf https://github.com/un4gt/astrbot-cli/releases/download/v0.1.3/astrbot-cli-installer.sh | sh
   ```
 - Windows powershell
   ```powershell
-  powershell -ExecutionPolicy Bypass -c "irm https://github.com/un4gt/astrbot-cli/releases/download/v0.1.2/astrbot-cli-installer.ps1 | iex"
+  powershell -ExecutionPolicy Bypass -c "irm https://github.com/un4gt/astrbot-cli/releases/download/v0.1.3/astrbot-cli-installer.ps1 | iex"
   ```
 - Macos
   ```bash
@@ -159,8 +159,11 @@ CPU 负载: 2
 获取 AstrBot 实例的实时日志输出，用于监控和调试。
 
 ```bash
-astrbot log
+astrbot log [--flush]
 ```
+
+选项：
+- `--flush` 或 `-f`：刷新日志，总是打印最新日志（清屏显示）。
 
 此命令将持续输出 AstrBot 的实时日志，直到手动停止（Ctrl+C）。
 
