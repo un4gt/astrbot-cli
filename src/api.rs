@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::io::Write;
 
 use futures::stream::StreamExt;
 use reqwest::{multipart, Method};
@@ -174,9 +175,10 @@ impl ApiClient {
         }
     }
 
-    pub async fn get_live_log(&self) -> anyhow::Result<()> {
+    pub async fn get_live_log(&self, flush: bool) -> anyhow::Result<()> {
         let request_builder = self.request(Method::GET, "api/live-log");
         let mut es = EventSource::new(request_builder)?;
+        let mut out = std::io::stdout().lock();
         while let Some(event) = es.next().await {
             match event {
                 Ok(ev) => match ev {
@@ -185,7 +187,10 @@ impl ApiClient {
                     }
                     Event::Message(message) => {
                         let message: LiveLogMessage = serde_json::from_str(&message.data)?;
-                        println!("{}", message.data);
+                        if flush {
+                            write!(out, "\x1B[2J\x1B[1;1H")?;
+                        }
+                        writeln!(out, "{}", message.data)?;
                     }
                 },
                 Err(err) => {

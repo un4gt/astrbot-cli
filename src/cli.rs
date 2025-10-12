@@ -36,7 +36,11 @@ pub enum Commands {
     /// Get astrbot stat
     Stat,
     /// Get astrbot live log
-    Log,
+    Log {
+        /// flush logs, always print latest logs
+        #[arg(short, long, help = "Flush logs")]
+        flush: bool,
+    },
 }
 
 #[derive(Subcommand, AsRefStr)]

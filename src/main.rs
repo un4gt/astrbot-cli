@@ -37,8 +37,8 @@ async fn main() {
                 Err(e) => eprintln!("Error retrieving statistics: {}", e),
             }
         }
-        Commands::Log => {
-            let _ = handle_live_log().await;
+        Commands::Log { flush } => {
+            let _ = handle_live_log(flush).await;
         }
     }
 }
