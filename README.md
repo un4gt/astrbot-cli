@@ -48,13 +48,13 @@ AstrBot CLI 是一个强大的命令行工具，专为管理 AstrBot 实例而�
 
 - Linux
   ```bash
-  curl --proto '=https' --tlsv1.2 -LsSf https://github.com/un4gt/astrbot-cli/releases/download/v0.1.3/astrbot-cli-installer.sh | sh
+  curl --proto '=https' --tlsv1.2 -LsSf https://github.com/un4gt/astrbot-cli/releases/download/v0.1.4/astrbot-cli-installer.sh | sh
   ```
-- Windows powershell
+- Windows PowerShell
   ```powershell
-  powershell -ExecutionPolicy Bypass -c "irm https://github.com/un4gt/astrbot-cli/releases/download/v0.1.3/astrbot-cli-installer.ps1 | iex"
+  powershell -ExecutionPolicy Bypass -c "irm https://github.com/un4gt/astrbot-cli/releases/download/v0.1.4/astrbot-cli-installer.ps1 | iex"
   ```
-- Macos
+- macOS
   ```bash
   brew install astrbot-cli
   ```
@@ -156,16 +156,35 @@ CPU 负载: 2
 
 ### 日志命令
 
-获取 AstrBot 实例的实时日志输出，用于监控和调试。
+获取 AstrBot 实例的日志输出，用于监控和调试。
+
+#### 实时日志
+
+获取 AstrBot 实例的实时日志输出：
 
 ```bash
-astrbot log [--flush]
+astrbot log live [--flush]
 ```
 
 选项：
 - `--flush` 或 `-f`：刷新日志，总是打印最新日志（清屏显示）。
 
 此命令将持续输出 AstrBot 的实时日志，直到手动停止（Ctrl+C）。
+
+#### 日志历史
+
+获取 AstrBot 实例的历史日志并保存到文件：
+
+```bash
+astrbot log history --output-file <文件路径>
+```
+
+示例：
+```bash
+astrbot log history --output-file logs.txt
+```
+
+此命令将获取历史日志并保存到指定的文件中。
 
 ### 完整示例
 
@@ -179,4 +198,14 @@ astrbot --verbose plugin get
 astrbot login --username admin --password secret --server https://api.astrbot.com
 astrbot plugin install --from-git https://github.com/un4gt/astrbot-plugin-example.git
 astrbot plugin on astrbot-plugin-example
+```
+
+获取实时日志：
+```bash
+astrbot log live --flush
+```
+
+获取历史日志：
+```bash
+astrbot log history --output-file /path/to/logs.txt
 ```
