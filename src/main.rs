@@ -1,13 +1,14 @@
 use clap::Parser;
-use cli::{handle_plugin_command, Cli, Commands};
-use live_log::handle_live_log;
+use cli::{handle_plugin_command, Cli, Commands, LogCommands};
+use log::{handle_history_log, handle_live_log};
+
 use login::handle_login;
 use stat::handle_stat;
 
 mod api;
 mod cli;
 mod config;
-mod live_log;
+mod log;
 mod login;
 mod plugin;
 mod stat;
@@ -37,8 +38,19 @@ async fn main() {
                 Err(e) => eprintln!("Error retrieving statistics: {}", e),
             }
         }
-        Commands::Log { flush } => {
-            let _ = handle_live_log(flush).await;
-        }
+        Commands::Log { action } => match action {
+            LogCommands::Live { flush } => {
+                if let Err(err) = handle_live_log(flush).await {
+                    eprintln!("Error fetching live log: {}", err);
+                    std::process::exit(1);
+                }
+            }
+            LogCommands::History { output_file } => {
+                if let Err(err) = handle_history_log(output_file).await {
+                    eprintln!("Error fetching log history: {}", err);
+                    std::process::exit(1);
+                }
+            }
+        },
     }
 }

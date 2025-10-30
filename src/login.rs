@@ -35,7 +35,7 @@ pub async fn handle_login(username: String, password: String, url: String) {
 
     // Prepare the login request
     let login_request = LoginRequest {
-        username: username.clone(),
+        username,
         password: password_hash,
     };
 

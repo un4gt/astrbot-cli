@@ -55,7 +55,9 @@ pub async fn create_git_archive() -> anyhow::Result<String> {
 }
 
 pub fn build_client() -> anyhow::Result<ApiClient> {
-    let credentials = ConfigManager::load_credentials()?;
+    let credentials = ConfigManager::load_credentials().with_context(|| {
+        "Failed to load credentials. Check that the config file exists and is valid, or sign in again."
+    })?;
     Ok(ApiClient::new(credentials.server_url, credentials.token))
 }
 

@@ -7,7 +7,7 @@ use strum::AsRefStr;
 #[derive(Parser)]
 #[command(name = "astrbot")]
 #[command(about = "AstrBot CLI - A command line tool for managing AstrBot")]
-#[command(version = "0.1.0")]
+#[command(version = "0.1.3")]
 pub struct Cli {
     /// Enable verbose output with detailed logs and comprehensive information
     #[arg(short, long, global = true, help = "Enable verbose output")]
@@ -35,11 +35,26 @@ pub enum Commands {
     },
     /// Get astrbot stat
     Stat,
-    /// Get astrbot live log
+    /// Log-related commands
     Log {
+        #[command(subcommand)]
+        action: LogCommands,
+    },
+}
+
+#[derive(Subcommand, AsRefStr)]
+pub enum LogCommands {
+    /// Get astrbot live log
+    Live {
         /// flush logs, always print latest logs
         #[arg(short, long, help = "Flush logs")]
         flush: bool,
+    },
+    /// Get log history
+    History {
+        /// output file path
+        #[arg(short, long, help = "Output file path")]
+        output_file: String,
     },
 }
 

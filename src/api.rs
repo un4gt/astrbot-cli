@@ -8,6 +8,27 @@ use serde::{de::DeserializeOwned, Deserialize};
 
 use crate::{iprintln, plugin::Plugin, stat::Stat, vprintln};
 
+#[derive(Debug, Deserialize)]
+pub struct LogHistory {
+    pub logs: Vec<LogRecord>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum LogRecord {
+    Text(String),
+    Object(serde_json::Value),
+}
+
+impl LogRecord {
+    pub fn into_line(self) -> String {
+        match self {
+            LogRecord::Text(text) => text,
+            LogRecord::Object(value) => value.to_string(),
+        }
+    }
+}
+
 #[derive(Deserialize)]
 #[allow(dead_code)]
 struct LiveLogMessage {
@@ -21,17 +42,22 @@ struct LiveLogMessage {
 #[derive(Deserialize, Debug)]
 pub struct ApiResponse<T> {
     pub status: String,
-    #[serde(default, deserialize_with = "null_to_empty_string")]
+    #[serde(default, deserialize_with = "value_to_string")]
     pub message: String,
     pub data: Option<T>,
 }
 
-fn null_to_empty_string<'de, D>(deserializer: D) -> Result<String, D::Error>
+fn value_to_string<'de, D>(deserializer: D) -> Result<String, D::Error>
 where
     D: serde::Deserializer<'de>,
 {
-    let opt = Option::<String>::deserialize(deserializer)?;
-    Ok(opt.unwrap_or_default())
+    let opt = Option::<serde_json::Value>::deserialize(deserializer)?;
+    let value = opt.unwrap_or(serde_json::Value::Null);
+    match value {
+        serde_json::Value::Null => Ok(String::new()),
+        serde_json::Value::String(s) => Ok(s),
+        other => Ok(other.to_string()),
+    }
 }
 
 impl<T> ApiResponse<T> {
@@ -168,6 +194,21 @@ impl ApiClient {
         if resp.is_ok() {
             match resp.data {
                 Some(stat) => Ok(stat),
+                None => anyhow::bail!("No data received"),
+            }
+        } else {
+            anyhow::bail!("API error: {}", resp.message);
+        }
+    }
+
+    pub async fn get_log_history(&self) -> anyhow::Result<LogHistory> {
+        let resp = self
+            .send_and_parse::<LogHistory>(self.request(Method::GET, "/api/log-history"))
+            .await?;
+        println!("status code {}", resp.status);
+        if resp.is_ok() {
+            match resp.data {
+                Some(data) => Ok(data),
                 None => anyhow::bail!("No data received"),
             }
         } else {
